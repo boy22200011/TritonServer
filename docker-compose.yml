@@ -1,21 +1,21 @@
 services:
   triton:
-    image: nvcr.io/nvidia/tritonserver:24.09-py3 # 版本可改
+    image: nvcr.io/nvidia/tritonserver:24.09-py3
     container_name: triton
     restart: unless-stopped
+    runtime: nvidia
     shm_size: "1g"
     ulimits:
       memlock: -1
       stack: 67108864
-    ports:
-      - "8000:8000" # HTTP
-      - "8001:8001" # gRPC
-      - "8002:8002" # Metrics
     environment:
-      # 視需求開啟：
-      TRITON_LOG_VERBOSE: "1"
-      TRITON_MODEL_CONTROL_MODE: "poll" # 開啟熱更新（建議）
-      # CUDA_VISIBLE_DEVICES: "0"           # 指定要用哪張 GPU
+      TRITON_MODEL_CONTROL_MODE: "poll"
+      NVIDIA_VISIBLE_DEVICES: "all" # 要鎖卡才改成 "0" 或 "0,2"
+      NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
     volumes:
       - ./models:/models
     command: >
@@ -26,11 +26,6 @@ services:
       --allow-http=true
       --allow-grpc=true
       --metrics-port=8002
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: ["gpu"] # 讓容器吃到 GPU
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8000/v2/health/ready"]
       interval: 10s

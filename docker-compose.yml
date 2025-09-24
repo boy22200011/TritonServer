@@ -1,9 +1,16 @@
 services:
   triton:
-    image: nvcr.io/nvidia/tritonserver:25.08-py3 # ★ 升級到 25.08（或至少 25.01）
+    image: nvcr.io/nvidia/tritonserver:25.08-py3
     container_name: triton
     restart: unless-stopped
     runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     shm_size: "1g"
     ulimits:
       memlock: -1
@@ -26,8 +33,3 @@ services:
       --allow-http=true
       --allow-grpc=true
       --metrics-port=8002
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8000/v2/health/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 12

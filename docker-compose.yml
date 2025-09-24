@@ -1,6 +1,6 @@
 services:
   triton:
-    image: nvcr.io/nvidia/tritonserver:24.09-py3
+    image: nvcr.io/nvidia/tritonserver:25.08-py3 # ★ 升級到 25.08（或至少 25.01）
     container_name: triton
     restart: unless-stopped
     runtime: nvidia
@@ -22,7 +22,6 @@ services:
       --model-repository=/models
       --model-control-mode=poll
       --repository-poll-secs=5
-      --disable-auto-complete-config=false
       --exit-on-error=false
       --allow-http=true
       --allow-grpc=true

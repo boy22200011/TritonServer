@@ -1,0 +1,19 @@
+# 此檔為範例依據模型修改 inputs 與 outputs
+
+name: "yolov8n"
+backend: "onnxruntime"            # 如果是 ONNX，建議用 backend 指定
+max_batch_size: 0                  # 固定 batch=1，就設 0（不開批次）
+default_model_filename: "best320.onnx"
+input {
+  name: "images"
+  data_type: TYPE_FP32
+  dims: [1, 3, 320, 320]           # max_batch_size=0 時，dims 寫完整 shape
+}
+output {
+  name: "output0"
+  data_type: TYPE_FP32
+  dims: [1, 10, 2100]
+}
+instance_group [
+  { kind: KIND_GPU }               # 讓 Triton 在 GPU 跑；要綁特定卡可加 gpus: [0]
+]
